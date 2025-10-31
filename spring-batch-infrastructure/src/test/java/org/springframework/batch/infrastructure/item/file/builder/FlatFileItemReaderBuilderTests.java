@@ -60,6 +60,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Glenn Renfro
  * @author Patrick Baumgartner
  * @author François Martin
+ * @author Daeho Kwon
  */
 class FlatFileItemReaderBuilderTests {
 
@@ -627,6 +628,39 @@ class FlatFileItemReaderBuilderTests {
 		Object fieldSetMapper = ReflectionTestUtils.getField(lineMapper, "fieldSetMapper");
 		assertNotNull(fieldSetMapper);
 		assertInstanceOf(BeanWrapperFieldSetMapper.class, fieldSetMapper);
+	}
+
+	@Test
+	void testDelimitedBuilderLambda() throws Exception {
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+			.resource(getResource("1,2,3"))
+			.delimited(config -> config.delimiter(",").names("first", "second", "third"))
+			.targetType(Foo.class)
+			.build();
+
+		reader.open(new ExecutionContext());
+		Foo item = reader.read();
+		assertEquals(1, item.getFirst());
+		assertEquals(2, item.getSecond());
+		assertEquals("3", item.getThird());
+		assertNull(reader.read());
+	}
+
+	@Test
+	void testFixedLengthBuilderLambda() throws Exception {
+		FlatFileItemReader<Foo> reader = new FlatFileItemReaderBuilder<Foo>().name("fooReader")
+			.resource(getResource("1  2  3"))
+			.fixedLength(config -> config.columns(new Range(1, 3), new Range(4, 6), new Range(7))
+				.names("first", "second", "third"))
+			.targetType(Foo.class)
+			.build();
+
+		reader.open(new ExecutionContext());
+		Foo item = reader.read();
+		assertEquals(1, item.getFirst());
+		assertEquals(2, item.getSecond());
+		assertEquals("3", item.getThird());
+		assertNull(reader.read());
 	}
 
 	private Resource getResource(String contents) {
