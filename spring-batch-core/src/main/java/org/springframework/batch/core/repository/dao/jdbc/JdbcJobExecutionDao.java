@@ -42,7 +42,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.support.incrementer.DataFieldMaxValueIncrementer;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.util.Assert;
 
 /**
@@ -217,10 +217,8 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 		Assert.notNull(jobInstance, "Job instance cannot be null.");
 		long jobInstanceId = jobInstance.getId();
 		// TODO optimize to a single query with a join if possible
-		List<Long> jobExecutionIds = getJdbcTemplate()
-			.queryForStream(getQuery(GET_JOB_EXECUTION_IDS_BY_INSTANCE_ID), (rs, rowNum) -> rs.getLong(1),
-					jobInstanceId)
-			.toList();
+		List<Long> jobExecutionIds = getJdbcTemplate().queryForList(getQuery(GET_JOB_EXECUTION_IDS_BY_INSTANCE_ID),
+				Long.class, jobInstanceId);
 		List<JobExecution> jobExecutions = new ArrayList<>(jobExecutionIds.size());
 		for (Long jobExecutionId : jobExecutionIds) {
 			jobExecutions.add(getJobExecution(jobExecutionId));
@@ -314,10 +312,10 @@ public class JdbcJobExecutionDao extends AbstractJdbcBatchMetadataDao implements
 	public JobExecution getLastJobExecution(JobInstance jobInstance) {
 		long jobInstanceId = jobInstance.getId();
 
-		long lastJobExecutionId = getJdbcTemplate().queryForObject(getQuery(GET_LAST_JOB_EXECUTION_ID),
-				(rs, rowNum) -> rs.getLong(1), jobInstanceId, jobInstanceId);
+		Long lastJobExecutionId = getJdbcTemplate().queryForObject(getQuery(GET_LAST_JOB_EXECUTION_ID), Long.class,
+				jobInstanceId, jobInstanceId);
 
-		return getJobExecution(lastJobExecutionId);
+		return lastJobExecutionId != null ? getJobExecution(lastJobExecutionId) : null;
 	}
 
 	@Override

@@ -26,7 +26,7 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.job.JobExecution;
 import org.springframework.batch.core.job.parameters.JobParameters;
 import org.springframework.batch.infrastructure.item.ExecutionContext;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Batch domain object representation for the execution of a step. Unlike
@@ -135,8 +135,7 @@ public class StepExecution extends Entity {
 	 * Returns the time when this execution ended or {@code null} if the step is running.
 	 * @return the time when this execution ended or {@code null} if the step is running.
 	 */
-	@Nullable
-	public LocalDateTime getEndTime() {
+	@Nullable public LocalDateTime getEndTime() {
 		return endTime;
 	}
 
@@ -232,8 +231,7 @@ public class StepExecution extends Entity {
 	 * Gets the time when this execution started.
 	 * @return the time when this execution started.
 	 */
-	@Nullable
-	public LocalDateTime getStartTime() {
+	@Nullable public LocalDateTime getStartTime() {
 		return startTime;
 	}
 
@@ -422,8 +420,7 @@ public class StepExecution extends Entity {
 	/**
 	 * @return the Date representing the last time this execution was persisted.
 	 */
-	@Nullable
-	public LocalDateTime getLastUpdated() {
+	@Nullable public LocalDateTime getLastUpdated() {
 		return lastUpdated;
 	}
 
@@ -491,7 +488,7 @@ public class StepExecution extends Entity {
 	 */
 	public String getSummary() {
 		return super.toString() + String.format(
-				", name=%s, status=%s, exitStatus=%s, readCount=%d, filterCount=%d, writeCount=%d readSkipCount=%d, writeSkipCount=%d"
+				", name=%s, status=%s, exitStatus=%s, readCount=%d, filterCount=%d, writeCount=%d, readSkipCount=%d, writeSkipCount=%d"
 						+ ", processSkipCount=%d, commitCount=%d, rollbackCount=%d",
 				stepName, status, exitStatus.getExitCode(), readCount, filterCount, writeCount, readSkipCount,
 				writeSkipCount, processSkipCount, commitCount, rollbackCount);
